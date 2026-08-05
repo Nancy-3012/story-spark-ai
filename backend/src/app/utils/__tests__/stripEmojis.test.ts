@@ -1,38 +1,37 @@
 import { stripEmojis } from "../stripEmojis";
 
-describe("stripEmojis utility", () => {
-  it("should return empty string for null, undefined or non-string inputs", () => {
+describe("stripEmojis", () => {
+  it("returns empty string for null input", () => {
     expect(stripEmojis(null as any)).toBe("");
+  });
+
+  it("returns empty string for undefined input", () => {
     expect(stripEmojis(undefined as any)).toBe("");
+  });
+
+  it("returns empty string for non-string input", () => {
     expect(stripEmojis(123 as any)).toBe("");
   });
 
-  it("should return the original string if it contains no emojis", () => {
+  it("returns empty string for empty string input", () => {
+    expect(stripEmojis("")).toBe("");
+  });
+
+  it("returns string unchanged when no emojis present", () => {
     expect(stripEmojis("hello world")).toBe("hello world");
-    expect(stripEmojis("12345!@#$%")).toBe("12345!@#$%");
   });
 
-  it("should strip simple smiley face emojis", () => {
-    expect(stripEmojis("hello 😊 world")).toBe("hello  world");
-    expect(stripEmojis("🚀 space adventure")).toBe("space adventure");
+  it("preserves numbers, punctuation, and spaces", () => {
+    expect(stripEmojis("123 !?@#$%^&*()")).toBe("123 !?@#$%^&*()");
   });
 
-  it("should strip complex zero-width joiner sequences", () => {
-    // Family emoji: 👨‍👩‍👧‍👦
-    expect(stripEmojis("family 👨‍👩‍👧‍👦 time")).toBe("family  time");
-  });
-
-  it("should strip country flag emojis", () => {
-    // Flag: 🇮🇳
-    expect(stripEmojis("India flag 🇮🇳")).toBe("India flag");
-  });
-
-  it("should return empty string if the input only contains emojis", () => {
-    expect(stripEmojis("😊🚀🇮🇳")).toBe("");
-
-describe("stripEmojis", () => {
   it("removes basic smiley emojis", () => {
     expect(stripEmojis("Hello 😀 World")).toBe("Hello  World");
+  });
+
+  it("removes simple smiley face emojis", () => {
+    expect(stripEmojis("hello 😊 world")).toBe("hello  world");
+    expect(stripEmojis("🚀 space adventure")).toBe("space adventure");
   });
 
   it("removes transport and map symbols", () => {
@@ -43,12 +42,20 @@ describe("stripEmojis", () => {
     expect(stripEmojis("Arrow ➡️ Check")).toBe("Arrow  Check");
   });
 
+  it("removes country flag emojis", () => {
+    expect(stripEmojis("India flag 🇮🇳")).toBe("India flag");
+  });
+
   it("removes flags (regional indicator symbols)", () => {
     expect(stripEmojis("US 🇺🇸 UK 🇬🇧")).toBe("US  UK ");
   });
 
-  it("removes zero-width joiner emoji sequences (skin tones)", () => {
+  it("removes zero-width joiner sequences (skin tones)", () => {
     expect(stripEmojis("Wave 👋🏽")).toBe("Wave ");
+  });
+
+  it("removes complex zero-width joiner sequences", () => {
+    expect(stripEmojis("family 👨‍👩‍👧‍👦 time")).toBe("family  time");
   });
 
   it("removes family and people emojis with modifiers", () => {
@@ -63,28 +70,11 @@ describe("stripEmojis", () => {
     expect(stripEmojis("Text\u{1F600}Text")).toBe("TextText");
   });
 
-  it("returns empty string for null input", () => {
-    expect(stripEmojis(null as any)).toBe("");
-  });
-
-  it("returns empty string for undefined input", () => {
-    expect(stripEmojis(undefined as any)).toBe("");
-  });
-
-  it("returns empty string for empty string input", () => {
-    expect(stripEmojis("")).toBe("");
-  });
-
-  it("returns string unchanged when no emojis present", () => {
-    expect(stripEmojis("Hello World")).toBe("Hello World");
-  });
-
-  it("preserves numbers, punctuation, and spaces", () => {
-    expect(stripEmojis("123 !?@#$%^&*()")).toBe("123 !?@#$%^&*()");
+  it("returns empty string if input only contains emojis", () => {
+    expect(stripEmojis("😊🚀🇮🇳")).toBe("");
   });
 
   it("handles unicode text outside emoji blocks", () => {
     expect(stripEmojis("Cafe with accent: cafe")).toBe("Cafe with accent: cafe");
-
   });
 });
