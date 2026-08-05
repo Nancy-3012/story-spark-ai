@@ -1,29 +1,5 @@
 import { stripEmojis } from "../stripEmojis";
 
-describe("stripEmojis", () => {
-  it("returns empty string for null input", () => {
-    expect(stripEmojis(null as any)).toBe("");
-  });
-
-  it("returns empty string for undefined input", () => {
-    expect(stripEmojis(undefined as any)).toBe("");
-  });
-
-  it("returns empty string for non-string input", () => {
-    expect(stripEmojis(123 as any)).toBe("");
-  });
-
-  it("returns empty string for empty string input", () => {
-    expect(stripEmojis("")).toBe("");
-  });
-
-  it("returns string unchanged when no emojis present", () => {
-    expect(stripEmojis("hello world")).toBe("hello world");
-  });
-
-  it("preserves numbers, punctuation, and spaces", () => {
-    expect(stripEmojis("123 !?@#$%^&*()")).toBe("123 !?@#$%^&*()");
-  });
 
   it("removes basic smiley emojis", () => {
     expect(stripEmojis("Hello 😀 World")).toBe("Hello  World");

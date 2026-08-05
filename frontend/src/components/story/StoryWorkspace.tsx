@@ -39,7 +39,8 @@ import StoryComparisonDashboard from "../comparison/StoryComparisonDashboard";
 import StoryTimelineVisualization from "../timeline/StoryTimelineVisualization";
 import StoryRelationshipGraph from "../relationship-graph/StoryRelationshipGraph";
 import StoryPlotTwistGenerator from "../plot-twist/StoryPlotTwistGenerator";
-import StoryReadingAnalytics from "../analytics/StoryReadingAnalytics";
+import StoryReadingAnalytics from "../analytics-jp/StoryReadingAnalytics";
+import VocabularyAnalyzer from "../vocabulary/VocabularyAnalyzer";
 
 import StoryRevisionHistory from "../revision-history/StoryRevisionHistory";
 import { createRevision } from "../../utils/storyRevisionHistory";
@@ -49,7 +50,6 @@ import StoryNamingAssistant from "../naming-assistant/StoryNamingAssistant";
 import StoryPublishingReadiness from "../publishing-readiness/StoryPublishingReadiness";
 import StoryTagGenerator from "../story-tags/StoryTagGenerator";
 import StoryReadingInfo from "../reading-info/StoryReadingInfo";
-import VocabularyAnalyzer from "../vocabulary/VocabularyAnalyzer";
 import StoryFocusMode from "../focus-mode/StoryFocusMode";
 import StoryContinuationSuggestions from "../story-continuation/StoryContinuationSuggestions";
 
@@ -100,7 +100,7 @@ const StoryWorkspace = () => {
     await navigator.clipboard.writeText(storyText);
     toast.success("Story copied to clipboard!");
   } catch (error) {
-    console.error(error);
+    logger.error(error);
     toast.error("Failed to copy story.");
   }
 };
@@ -130,7 +130,7 @@ const StoryWorkspace = () => {
       downloadBlob(blob, getSafeFileName(title, "md"));
       toast.success("Markdown downloaded!");
     } catch (error) {
-      console.error(error);
+      logger.error(error);
       toast.error("Failed to export Markdown.");
     }
   };
@@ -161,7 +161,7 @@ const StoryWorkspace = () => {
 
       toast.success("PDF downloaded!");
     } catch (error) {
-      console.error(error);
+      logger.error(error);
       toast.error("Failed to export PDF.");
     } finally {
       toast.dismiss(toastId);
@@ -194,7 +194,7 @@ const StoryWorkspace = () => {
       downloadBlob(blob, getSafeFileName(title, "docx"));
       toast.success("DOCX downloaded!");
     } catch (error) {
-      console.error(error);
+      logger.error(error);
       toast.error("Failed to export DOCX.");
     }
   };
@@ -212,6 +212,7 @@ const StoryWorkspace = () => {
       <Toaster position="top-right" reverseOrder={false} />
       <ChapterSidebar
         chapters={currentStory.chapters}
+        maxChapterWords={2500}
       />
 
       <div className="flex flex-col flex-1">
@@ -296,12 +297,12 @@ const StoryWorkspace = () => {
 
 <StoryCoverGenerator
   title={currentStory.title}
-  genre={currentStory.genre ?? "General"}
-  theme={currentStory.theme ?? currentStory.title}
+  genre={(currentStory as any).genre ?? "General"}
+  theme={(currentStory as any).theme ?? currentStory.title}
   characters={
-    currentStory.characters?.map((c) => c.name) ??
+    (currentStory as any).characters?.map((c: any) => c.name) ??
     currentStory.chapters
-      ?.flatMap((ch) => ch.characters ?? [])
+      ?.flatMap((ch: any) => ch.characters ?? [])
       .slice(0, 3) ??
     []
   }
@@ -313,9 +314,7 @@ const StoryWorkspace = () => {
   }
 />
 
-<StoryBranchingEditor
-  storyTitle={currentStory.title}
-/>
+<StoryBranchingEditor />
 <PlotHoleDetector
   story={
     fullStoryContent
@@ -447,18 +446,7 @@ const StoryWorkspace = () => {
 
   storyB={previousStoryDraft ?? ""}
 /> */}
-  storyB={
-    fullStoryContent
-    currentStory.chapters?.length
-      ? currentStory.chapters[currentStory.chapters.length - 1].content
-      : ""
-  }
-  storyB={
-    currentStory.chapters?.length && currentStory.chapters.length > 1
-      ? currentStory.chapters[currentStory.chapters.length - 2].content
-      : "(previous chapter will appear here)"
-  }
-/>
+
 
 
 <StoryTimelineVisualization
@@ -574,7 +562,7 @@ const StoryWorkspace = () => {
   </div>
 </>
         ) : (
-          <CharacterNetwork storyId={currentStory.id} />
+          <CharacterNetwork storyId={currentStory.id} storyContent={currentStory.chapters?.map((chapter) => chapter.content).join("\n\n") || ""} />
         )}
       </div>
     </div>
